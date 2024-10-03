@@ -1,4 +1,4 @@
-#ERD 설계
+# ERD 설계
 ![image](https://github.com/user-attachments/assets/3463fef3-32c0-47e5-a002-c080fa307e03)
 
 # API 명세서
