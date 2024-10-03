@@ -1,6 +1,7 @@
 package com.example.todo.domain.todo.repository;
 
 
+import com.example.todo.domain.todo.dto.TodoMemberDto;
 import com.example.todo.domain.todo.dto.TodoRequestDto;
 import com.example.todo.domain.todo.dto.TodoResponseDto;
 import com.example.todo.domain.todo.entity.Todo;
@@ -24,12 +25,12 @@ public class TodoRepository {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        String sql = "INSERT INTO todo (username, title,description,password,created_at) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO todo (member_id, title,description,password,created_at) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(con -> {
                     PreparedStatement preparedStatement = con.prepareStatement(sql,
                             Statement.RETURN_GENERATED_KEYS);
 
-                    preparedStatement.setString(1, todo.getUsername());
+                    preparedStatement.setLong(1, todo.getMemberId());
                     preparedStatement.setString(2, todo.getTitle());
                     preparedStatement.setString(3, todo.getDescription());
                     preparedStatement.setString(4, todo.getPassword());
@@ -45,26 +46,63 @@ public class TodoRepository {
         return todo;
     }
 
-    public List<TodoResponseDto>  findAll() {
-        String sql = "SELECT * FROM todo";
+    public List<TodoMemberDto>  findAll() {
+        String sql = "SELECT * FROM todo\n" +
+                     "left join member m on todo.member_id = m.id";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
 
             Long id = rs.getLong("id");
-            String username = rs.getString("username");
+            Long member_id = rs.getLong("member_id");
             String title = rs.getString("title");
+            String username = rs.getString("username");
+            String email = rs.getString("email");
             String description = rs.getString("description");
             String createdAt = rs.getString("created_at");
             String updatedAt = rs.getString("updated_at");
-            return new TodoResponseDto(
+            return new TodoMemberDto(
                     id,
-                    username,
+                    member_id,
                     title,
+                    username,
+                    email,
                     description,
                     createdAt,
                     updatedAt
             );
         });
+    }
+
+    /**
+     * 페이지네이션 적용
+     */
+    public List<TodoMemberDto>  findAllWithPaging(int page, int size) {
+        String sql = "SELECT * FROM todo " +
+                "LEFT JOIN member m ON todo.member_id = m.id " +
+                "ORDER BY todo.id LIMIT ? OFFSET ?";
+
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+
+            Long id = rs.getLong("id");
+            Long member_id = rs.getLong("member_id");
+            String title = rs.getString("title");
+            String username = rs.getString("username");
+            String email = rs.getString("email");
+            String description = rs.getString("description");
+            String createdAt = rs.getString("created_at");
+            String updatedAt = rs.getString("updated_at");
+            return new TodoMemberDto(
+                    id,
+                    member_id,
+                    title,
+                    username,
+                    email,
+                    description,
+                    createdAt,
+                    updatedAt
+            );
+        },size, page*size);
     }
 
     public Todo findById(Long todoId) {
@@ -80,8 +118,8 @@ public class TodoRepository {
     }
 
     public void update(Long id, TodoRequestDto requestDto) {
-        String sql = "UPDATE todo SET description = ?, username = ?, updated_at = ? WHERE id = ?";
-        jdbcTemplate.update(sql, requestDto.getDescription(), requestDto.getUsername(), requestDto.getUpdatedAt(), id);
+        String sql = "UPDATE todo SET description = ?, member_id = ?, updated_at = ? WHERE id = ?";
+        jdbcTemplate.update(sql, requestDto.getDescription(), requestDto.getMemberId(), requestDto.getUpdatedAt(), id);
     }
 
     public void deleteById(Long id) {

@@ -1,5 +1,6 @@
 package com.example.todo.domain.todo.controller;
 
+import com.example.todo.domain.todo.dto.TodoMemberDto;
 import com.example.todo.domain.todo.dto.TodoRequestDto;
 import com.example.todo.domain.todo.dto.TodoResponseDto;
 import com.example.todo.domain.todo.service.TodoService;
@@ -27,10 +28,11 @@ public class TodoController {
 
     //전체 일정 조회
     @GetMapping()
-    public ResponseEntity<List<TodoResponseDto>> getTodoList(){
+    public ResponseEntity<List<TodoMemberDto>> getTodoList(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(todoService.getTodoList());
+                .body(todoService.getTodoListWithPaging(page,size));
     }
 
     //선택 일정 조회

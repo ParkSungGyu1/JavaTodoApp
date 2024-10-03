@@ -32,3 +32,10 @@ CREATE TABLE member (
                         created_at VARCHAR(10),
                         updated_at VARCHAR(10)
 );
+
+#유저 추가 쿼리
+INSERT INTO member (username, email, created_at, updated_at)
+VALUES ('박유저', 'user@example.com', '2024-10-03', '2024-10-04');
+
+SELECT * FROM todo
+left join member m on todo.member_id = m.id;
